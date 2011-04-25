@@ -1,0 +1,22 @@
+A small library for rendering error messages (passing storage deallocation
+responsibility to the caller).
+
+The project build assumes a directory structure like this:
+
+src
+|
++-apps
+|
++-libs
+| |
+| +-liberror
+|
++-3rd
+
+*** BUILDING ON WINDOWS ***
+
+make -f Makefile.win32
+
+*** BUILDING ON LINUX ***
+
+make -f Makefile.linux

@@ -1,0 +1,60 @@
+#
+# Copyright (C) 2011 Chris McClelland
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+PLATFORM = linux
+TARGET = lib/$(PLATFORM)/liberror.a
+UTPP_VERSION = 1.4
+UTPP_HOME = ../../3rd/UnitTest++
+
+OBJDIR = .build
+DEPDIR = .deps
+CC_SRCS = $(shell ls *.c)
+CC_OBJS = $(CC_SRCS:%.c=$(OBJDIR)/$(PLATFORM)/%.o)
+CC = gcc
+CFLAGS = -O3 -Wall -Wextra -Wstrict-prototypes -Wundef -std=c99 -pedantic-errors -I../../include
+#CFLAGS = -g -Wall -Wextra -Wstrict-prototypes -Wundef -std=c99 -pedantic-errors -I../../include
+
+all: $(UTPP_HOME)/libUnitTest++.a ../../include $(TARGET) tests
+
+$(TARGET): $(CC_OBJS)
+	mkdir -p lib/$(PLATFORM)
+	$(AR) cr $@ $^
+
+$(OBJDIR)/$(PLATFORM)/%.o : %.c
+	$(CC) -c $(CFLAGS) -MMD -MP -MF $(DEPDIR)/$(PLATFORM)/$(@F).d -Wa,-adhlns=$(OBJDIR)/$(PLATFORM)/$<.lst $< -o $@
+
+-include Makefile.common
+
+$(UTPP_HOME)/libUnitTest++.a: $(UTPP_HOME)
+	make -C $(UTPP_HOME)
+
+$(UTPP_HOME):
+	wget -O unittest-cpp.zip --no-check-certificate http://sourceforge.net/projects/unittest-cpp/files/UnitTest++/$(UTPP_VERSION)/unittest-cpp-$(UTPP_VERSION).zip/download
+	unzip unittest-cpp.zip
+	mkdir -p ../../3rd
+	mv UnitTest++ ../../3rd/
+	rm unittest-cpp.zip
+
+clean: FORCE
+	make -C tests clean
+	rm -rf $(OBJDIR) $(DEPDIR) lib Debug Release *.ncb *.suo *.user
+
+tests: FORCE
+	make -C tests
+
+-include $(shell mkdir -p $(OBJDIR)/$(PLATFORM) $(DEPDIR)/$(PLATFORM) 2>/dev/null) $(wildcard $(DEPDIR)/$(PLATFORM)/*)
+
+FORCE:
