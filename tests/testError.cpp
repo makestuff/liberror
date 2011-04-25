@@ -15,7 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <UnitTest++.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <errno.h>
 #include "../error.h"
 
 char buf[1024];
@@ -40,4 +43,17 @@ TEST(Error_testRender) {
 		CHECK_EQUAL(buf, error);
 		free((void*)error);
 	}
+}
+
+TEST(Error_testStdRender) {
+	const char *error, *expected;
+	FILE *f;
+	f = fopen("nonExistentFile.txt", "r");
+	CHECK(!f);
+	error = renderStdError();
+	f = fopen("nonExistentFile.txt", "r");
+	CHECK(!f);
+	expected = strerror(errno);
+	CHECK_EQUAL(expected, error);
+	free((void*)error);
 }

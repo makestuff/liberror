@@ -24,6 +24,7 @@ extern "C" {
 #endif
 
 	const char *renderError(const char *format, ...);
+	const char *renderStdError(void);
 
 #ifdef __cplusplus
 }

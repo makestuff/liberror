@@ -14,9 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#ifdef WIN32
+#define strerror_r(err, buf, size) strerror_s(buf, size, err)
+#else
+#undef _GNU_SOURCE
+#define _XOPEN_SOURCE 600
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <string.h>
+#include <errno.h>
 #include "error.h"
 
 // Code inspired by http://linux.die.net/man/3/snprintf
@@ -50,6 +58,40 @@ const char *renderError(const char *format, ...) {
 		} else {
 			// glibc 2.1 has a C99-compliant vsnprintf(), so it returns the number of bytes needed
 			size = returnCode + 1;
+		}
+		newBufPtr = realloc(bufPtr, size);
+		if ( newBufPtr == NULL ) {
+			free(bufPtr);
+			return NULL;
+		} else {
+			bufPtr = newBufPtr;
+		}
+	}
+}
+
+const char *renderStdError(void) {
+	// Guess we need no more than 512 bytes
+	int returnCode, size = 512;
+	char *bufPtr, *newBufPtr;
+	const int errSave = errno;
+
+	bufPtr = malloc(size);
+	if ( bufPtr == NULL ) {
+		// Insufficient memory
+		return NULL;
+	}
+	for ( ; ; ) {
+		// Try to print in the allocated space
+		returnCode = strerror_r(errSave, bufPtr, size);
+		if ( returnCode == 0 ) {
+			// Yay, it fits! (WIN32 comes through here even if the message was truncated...doh)
+			return bufPtr;
+		} else if ( returnCode == -1 && errno == ERANGE ) {
+			// It doesn't fit...resize buffer and try again
+			size *= 2;
+		} else {
+			// Some other problem...invalid errno perhaps?
+			return NULL;
 		}
 		newBufPtr = realloc(bufPtr, size);
 		if ( newBufPtr == NULL ) {
