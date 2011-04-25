@@ -19,7 +19,7 @@
 #
 TARGET = runTests
 UTPP_HOME=../../../3rd/UnitTest++
-LIB = ../lib/linux/liberror.a
+LIB = ../liberror.a
 
 CPP_SRCS = $(shell ls *.cpp)
 CPP_OBJS = $(CPP_SRCS:%.cpp=$(OBJDIR)/%.o)

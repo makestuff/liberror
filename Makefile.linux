@@ -14,15 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-PLATFORM = linux
-TARGET = lib/$(PLATFORM)/liberror.a
+TARGET = liberror.a
 UTPP_VERSION = 1.4
 UTPP_HOME = ../../3rd/UnitTest++
 
 OBJDIR = .build
 DEPDIR = .deps
 CC_SRCS = $(shell ls *.c)
-CC_OBJS = $(CC_SRCS:%.c=$(OBJDIR)/$(PLATFORM)/%.o)
+CC_OBJS = $(CC_SRCS:%.c=$(OBJDIR)/%.o)
 CC = gcc
 CFLAGS = -O3 -Wall -Wextra -Wstrict-prototypes -Wundef -std=c99 -pedantic-errors -I../../include
 #CFLAGS = -g -Wall -Wextra -Wstrict-prototypes -Wundef -std=c99 -pedantic-errors -I../../include
@@ -30,11 +29,10 @@ CFLAGS = -O3 -Wall -Wextra -Wstrict-prototypes -Wundef -std=c99 -pedantic-errors
 all: $(UTPP_HOME)/libUnitTest++.a ../../include $(TARGET) tests
 
 $(TARGET): $(CC_OBJS)
-	mkdir -p lib/$(PLATFORM)
 	$(AR) cr $@ $^
 
-$(OBJDIR)/$(PLATFORM)/%.o : %.c
-	$(CC) -c $(CFLAGS) -MMD -MP -MF $(DEPDIR)/$(PLATFORM)/$(@F).d -Wa,-adhlns=$(OBJDIR)/$(PLATFORM)/$<.lst $< -o $@
+$(OBJDIR)/%.o : %.c
+	$(CC) -c $(CFLAGS) -MMD -MP -MF $(DEPDIR)/$(@F).d -Wa,-adhlns=$(OBJDIR)/$<.lst $< -o $@
 
 -include Makefile.common
 
@@ -50,11 +48,11 @@ $(UTPP_HOME):
 
 clean: FORCE
 	make -C tests clean
-	rm -rf $(OBJDIR) $(DEPDIR) lib Debug Release *.ncb *.suo *.user
+	rm -rf $(TARGET) $(OBJDIR) $(DEPDIR) Release Debug *.ncb *.suo *.user
 
 tests: FORCE
 	make -C tests
 
--include $(shell mkdir -p $(OBJDIR)/$(PLATFORM) $(DEPDIR)/$(PLATFORM) 2>/dev/null) $(wildcard $(DEPDIR)/$(PLATFORM)/*)
+-include $(shell mkdir -p $(OBJDIR) $(DEPDIR) 2>/dev/null) $(wildcard $(DEPDIR)/*)
 
 FORCE:
