@@ -19,7 +19,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include "../error.h"
+#include "../liberror.h"
 
 char buf[1024];
 
@@ -34,15 +34,25 @@ void fillBuf(int count, char value) {
 	}
 }
 
+TEST(Error_testNullRender) {
+	fillBuf(16, 'A');
+	errRender(NULL, buf);
+}
+
 TEST(Error_testRender) {
 	int i;
 	const char *error;
 	for ( i = 500; i < 516; i++ ) {
 		fillBuf(i, 'A');
-		error = renderError(buf);
+		errRender(&error, buf);
 		CHECK_EQUAL(buf, error);
-		free((void*)error);
+		errFree(error);
 	}
+}
+
+TEST(Error_testNullStdRender) {
+	fillBuf(16, 'A');
+	errRenderStd(NULL);
 }
 
 TEST(Error_testStdRender) {
@@ -50,10 +60,10 @@ TEST(Error_testStdRender) {
 	FILE *f;
 	f = fopen("nonExistentFile.txt", "r");
 	CHECK(!f);
-	error = renderStdError();
+	errRenderStd(&error);
 	f = fopen("nonExistentFile.txt", "r");
 	CHECK(!f);
 	expected = strerror(errno);
 	CHECK_EQUAL(expected, error);
-	free((void*)error);
+	errFree(error);
 }
