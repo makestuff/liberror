@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ROOT = ../../..
-DEPS = unittest++ error
+DEPS = 
 TYPE = exe
 
 -include $(ROOT)/common/top.mk
