@@ -14,8 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-ROOT = ../../..
-DEPS = 
-TYPE = exe
+ROOT    := $(realpath ../../..)
+DEPS    :=
+TYPE    := exe
+SUBDIRS :=
 
 -include $(ROOT)/common/top.mk
