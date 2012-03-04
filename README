@@ -1,16 +1,2 @@
 A small library for rendering error messages (passing storage deallocation
 responsibility to the caller).
-
-The project build assumes a directory structure like this:
-
-src
-|
-+-common
-|
-+-apps
-|
-+-libs
-| |
-| +-liberror
-|
-+-3rd
