@@ -78,8 +78,8 @@ DLLEXPORT(void) errRender(const char **error, const char *format, ...) {
 DLLEXPORT(void) errPrefix(const char **error, const char *prefix) {
 	if ( error && prefix ) {
 		char *newError, *p;
-		const int pLen = strlen(prefix); // ": " and null terminator
-		const int len = pLen + strlen(*error) + 3; // ": " and null terminator
+		const size_t pLen = strlen(prefix); // ": " and null terminator
+		const size_t len = pLen + strlen(*error) + 3; // ": " and null terminator
 		p = newError = (char*)malloc(len);
 		if ( newError == NULL ) {
 			errFree(*error);
