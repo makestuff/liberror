@@ -76,7 +76,11 @@ DLLEXPORT(void) errRender(const char **error, const char *format, ...) {
 // Add a prefix to the front of the error by reallocating & copying
 //
 DLLEXPORT(void) errPrefix(const char **error, const char *prefix) {
-	if ( error && prefix ) {
+	if ( !prefix || !error ) {
+		return;
+	}
+	if ( *error ) {
+		// There's already something there - prefix it
 		char *newError, *p;
 		const size_t pLen = strlen(prefix); // ": " and null terminator
 		const size_t len = pLen + strlen(*error) + 3; // ": " and null terminator
@@ -92,6 +96,11 @@ DLLEXPORT(void) errPrefix(const char **error, const char *prefix) {
 		*p++ = ' ';
 		strcpy(p, *error);
 		errFree(*error);
+		*error = newError;
+	} else {
+		// Nothing is already there, so just copy
+		char *newError = (char*)malloc(strlen(prefix) + 1);
+		strcpy(newError, prefix);
 		*error = newError;
 	}
 }

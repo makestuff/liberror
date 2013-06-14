@@ -41,7 +41,7 @@ TEST(Error_testNullRender) {
 
 TEST(Error_testRender) {
 	int i;
-	const char *error;
+	const char *error = NULL;
 	for ( i = 500; i < 516; i++ ) {
 		fillBuf(i, 'A');
 		errRender(&error, buf);
@@ -56,7 +56,7 @@ TEST(Error_testNullStdRender) {
 }
 
 TEST(Error_testStdRender) {
-	const char *error, *expected;
+	const char *error = NULL, *expected;
 	FILE *f;
 	f = fopen("nonExistentFile.txt", "r");
 	CHECK(!f);
@@ -66,4 +66,31 @@ TEST(Error_testStdRender) {
 	expected = strerror(errno);
 	CHECK_EQUAL(expected, error);
 	errFree(error);
+}
+
+TEST(Error_testPrefixSomething) {
+	#define MSG "Foo Bar"
+	#define PFX "myPrefix()"
+	const char *error = NULL;
+	const char *const expected = PFX": "MSG;
+	errRender(&error, MSG);
+	CHECK_EQUAL(MSG, error);
+	errPrefix(&error, PFX);
+	CHECK_EQUAL(expected, error);
+	errFree(error);
+}
+
+TEST(Error_testPrefixNothing) {
+	const char *error = NULL;
+	const char *const expected = "myPrefix(): Foo Bar";
+	errPrefix(&error, expected);
+	CHECK_EQUAL(expected, error);
+	errFree(error);
+}
+
+TEST(Error_testPrefixNull) {
+	const char *error = NULL;
+	errPrefix(NULL, "Foo");
+	errPrefix(&error, NULL);
+	CHECK(!error);
 }
