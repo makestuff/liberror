@@ -25,6 +25,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <errno.h>
+#include <assert.h>
 #include "liberror.h"
 
 // Code inspired by http://linux.die.net/man/3/snprintf
@@ -32,9 +33,11 @@
 DLLEXPORT(void) errRender(const char **error, const char *format, ...) {
 	if ( error ) {
 		// Guess we need no more than 512 bytes
-		int returnCode, size = 512;
+		int status;
+		size_t size = 512;
 		char *bufPtr, *newBufPtr;
 		va_list argList;
+		assert(*error == NULL);
 		bufPtr = (char*)malloc(size);
 		if ( bufPtr == NULL ) {
 			// Insufficient memory
@@ -44,22 +47,22 @@ DLLEXPORT(void) errRender(const char **error, const char *format, ...) {
 		for ( ; ; ) {
 			// Try to print in the allocated space
 			va_start(argList, format);
-			returnCode = vsnprintf(bufPtr, size, format, argList);
+			status = vsnprintf(bufPtr, size, format, argList);
 			va_end(argList);
 			
 			// If that worked, return the string
-			if ( returnCode != -1 && returnCode < size ) {
+			if ( status != -1 && (size_t)status < size ) {
 				*error = bufPtr;
 				return;
 			}
 			
 			// Else try again with more space
-			if ( returnCode == -1 ) {
+			if ( status == -1 ) {
 				// vsnprintf() in glibc 2.0 and MSVC not C99-compliant: returns -1 if buf too small
 				size *= 2;
 			} else {
 				// vsnprintf() in glibc 2.1 is C99-compliant: returns the exact no. of bytes needed
-				size = returnCode + 1;
+				size = (size_t)status + 1;
 			}
 			newBufPtr = (char*)realloc(bufPtr, size);
 			if ( newBufPtr == NULL ) {
@@ -110,7 +113,8 @@ DLLEXPORT(void) errPrefix(const char **error, const char *prefix) {
 DLLEXPORT(void) errRenderStd(const char **error) {
 	if ( error ) {
 		// Guess we need no more than 512 bytes
-		int returnCode, size = 512;
+		int status;
+		size_t size = 512;
 		char *bufPtr, *newBufPtr;
 		const int errSave = errno;
 		bufPtr = (char*)malloc(size);
@@ -121,12 +125,12 @@ DLLEXPORT(void) errRenderStd(const char **error) {
 		}
 		for ( ; ; ) {
 			// Try to print in the allocated space
-			returnCode = strerror_r(errSave, bufPtr, size);
-			if ( returnCode == 0 ) {
+			status = strerror_r(errSave, bufPtr, size);
+			if ( status == 0 ) {
 				// Yay, it fits! (WIN32 comes through here even if the message was truncated...doh)
 				*error = bufPtr;
 				return;
-			} else if ( returnCode == -1 && errno == ERANGE ) {
+			} else if ( status == -1 && errno == ERANGE ) {
 				// It doesn't fit...resize buffer and try again
 				size *= 2;
 			} else {

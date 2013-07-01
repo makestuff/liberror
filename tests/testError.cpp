@@ -41,8 +41,9 @@ TEST(Error_testNullRender) {
 
 TEST(Error_testRender) {
 	int i;
-	const char *error = NULL;
+	const char *error;
 	for ( i = 500; i < 516; i++ ) {
+		error = NULL;
 		fillBuf(i, 'A');
 		errRender(&error, buf);
 		CHECK_EQUAL(buf, error);

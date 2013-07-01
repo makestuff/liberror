@@ -23,14 +23,20 @@
 extern "C" {
 #endif
 
-	// Jump out of the current function, with the specified returnCode
-	#define FAIL(x) returnCode = x; goto cleanup
+	#undef CHECK_INTERNAL4
+	#define CHECK_INTERNAL4(condition, value, label, prefix) \
+		if ( condition ) { \
+			errPrefix(error, prefix); \
+			retVal = value; \
+			goto label; \
+		}
 
-	// If the condition is true, prefix the error string, and jump out of the current function
-	#define CHECK_STATUS(condition, prefix, retCode) \
-		if ( condition ) {                           \
-			errPrefix(error, prefix);              \
-			FAIL(retCode);                           \
+	#undef CHECK_INTERNAL5
+	#define CHECK_INTERNAL5(condition, value, label, ...) \
+		if ( condition ) { \
+			errRender(error, __VA_ARGS__); \
+			retVal = value; \
+			goto label; \
 		}
 
 	// Render an error message into a newly-alloc'd buffer
