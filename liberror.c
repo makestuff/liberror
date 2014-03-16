@@ -15,7 +15,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifdef WIN32
-	#define strerror_r(err, buf, size) strerror_s(buf, size, err)
+	#ifdef __MINGW32__
+		#include <stddef.h>
+		#include <stdio.h>
+		#include <errno.h>
+		__MINGW_IMPORT int _sys_nerr;
+		#define sys_nerr _sys_nerr
+		__MINGW_IMPORT char* _sys_errlist[];
+		#define sys_errlist _sys_errlist
+		static int strerror_r(int errCode, char *buffer, size_t bufSize) {
+			size_t numBytes;
+			if ( errCode < sys_nerr ) {
+				numBytes = snprintf(buffer, bufSize, "%s", sys_errlist[errCode]);
+				return (numBytes >= bufSize) ? ERANGE : 0;
+			} else {
+				numBytes = snprintf(buffer, bufSize, "Unknown error %d", errCode);
+				return EINVAL;
+			}
+		}
+	#elif defined(_MSC_VER)
+		#define strerror_r(err, buf, size) strerror_s(buf, size, err)
+	#endif
 #else
 	#undef _GNU_SOURCE
 	#define _XOPEN_SOURCE 600
