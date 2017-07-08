@@ -73,7 +73,7 @@ TEST(Error_testPrefixSomething) {
 	#define MSG "Foo Bar"
 	#define PFX "myPrefix()"
 	const char *error = NULL;
-	const char *const expected = PFX": "MSG;
+	const char *const expected = PFX ": " MSG;
 	errRender(&error, MSG);
 	CHECK_EQUAL(MSG, error);
 	errPrefix(&error, PFX);
