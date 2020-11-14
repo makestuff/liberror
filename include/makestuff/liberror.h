@@ -17,11 +17,25 @@
 #ifndef LIBERROR_H
 #define LIBERROR_H
 
-#include <makestuff.h>
+#include <makestuff/common.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+	#undef FAIL_INTERNAL3
+	#define FAIL_INTERNAL3(code, label, prefix) { \
+		errPrefix(error, prefix); \
+		retVal = code; \
+		goto label; \
+	}
+
+	#undef FAIL_INTERNAL5
+	#define FAIL_INTERNAL5(code, label, ...) { \
+		errRender(error, __VA_ARGS__); \
+		retVal = code; \
+		goto label; \
+	}
 
 	#undef CHECK_INTERNAL4
 	#define CHECK_INTERNAL4(condition, value, label, prefix) \

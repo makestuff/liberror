@@ -14,12 +14,8 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <UnitTest++.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
-#include "../liberror.h"
+#include <gtest/gtest.h>
+#include <makestuff/liberror.h>
 
 char buf[1024];
 
@@ -34,64 +30,64 @@ void fillBuf(int count, char value) {
 	}
 }
 
-TEST(Error_testNullRender) {
+TEST(Error, testNullRender) {
 	fillBuf(16, 'A');
 	errRender(NULL, buf);
 }
 
-TEST(Error_testRender) {
+TEST(Error, testRender) {
 	int i;
 	const char *error;
 	for ( i = 500; i < 516; i++ ) {
 		error = NULL;
 		fillBuf(i, 'A');
 		errRender(&error, buf);
-		CHECK_EQUAL(buf, error);
+		ASSERT_STREQ(buf, error);
 		errFree(error);
 	}
 }
 
-TEST(Error_testNullStdRender) {
+TEST(Error, testNullStdRender) {
 	fillBuf(16, 'A');
 	errRenderStd(NULL);
 }
 
-TEST(Error_testStdRender) {
+TEST(Error, testStdRender) {
 	const char *error = NULL, *expected;
 	FILE *f;
 	f = fopen("nonExistentFile.txt", "r");
-	CHECK(!f);
+	ASSERT_FALSE(f);
 	errRenderStd(&error);
 	f = fopen("nonExistentFile.txt", "r");
-	CHECK(!f);
+	ASSERT_FALSE(f);
 	expected = strerror(errno);
-	CHECK_EQUAL(expected, error);
+	ASSERT_STREQ(expected, error);
 	errFree(error);
 }
 
-TEST(Error_testPrefixSomething) {
+TEST(Error, testPrefixSomething) {
 	#define MSG "Foo Bar"
 	#define PFX "myPrefix()"
 	const char *error = NULL;
 	const char *const expected = PFX ": " MSG;
 	errRender(&error, MSG);
-	CHECK_EQUAL(MSG, error);
+	ASSERT_STREQ(MSG, error);
 	errPrefix(&error, PFX);
-	CHECK_EQUAL(expected, error);
+	ASSERT_STREQ(expected, error);
 	errFree(error);
 }
 
-TEST(Error_testPrefixNothing) {
+TEST(Error, testPrefixNothing) {
 	const char *error = NULL;
 	const char *const expected = "myPrefix(): Foo Bar";
 	errPrefix(&error, expected);
-	CHECK_EQUAL(expected, error);
+	ASSERT_STREQ(expected, error);
 	errFree(error);
 }
 
-TEST(Error_testPrefixNull) {
+TEST(Error, testPrefixNull) {
 	const char *error = NULL;
 	errPrefix(NULL, "Foo");
 	errPrefix(&error, NULL);
-	CHECK(!error);
+	ASSERT_FALSE(error);
 }

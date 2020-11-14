@@ -46,7 +46,7 @@
 #include <string.h>
 #include <errno.h>
 #include <assert.h>
-#include "liberror.h"
+#include <makestuff/liberror.h>
 
 // Code inspired by http://linux.die.net/man/3/snprintf
 //
@@ -105,25 +105,27 @@ DLLEXPORT(void) errPrefix(const char **error, const char *prefix) {
 	if ( *error ) {
 		// There's already something there - prefix it
 		char *newError, *p;
-		const size_t pLen = strlen(prefix); // ": " and null terminator
-		const size_t len = pLen + strlen(*error) + 3; // ": " and null terminator
+		const size_t pLen = strlen(prefix);
+		const size_t eLen = strlen(*error);
+		const size_t len = pLen + eLen + 3;  // ": " and null terminator
 		p = newError = (char*)malloc(len);
 		if ( newError == NULL ) {
 			errFree(*error);
 			*error = NULL;
 			return;
 		}
-		strcpy(p, prefix);
+		strncpy(p, prefix, pLen + 1);
 		p += pLen;
 		*p++ = ':';
 		*p++ = ' ';
-		strcpy(p, *error);
+		strncpy(p, *error, eLen + 1);
 		errFree(*error);
 		*error = newError;
 	} else {
 		// Nothing is already there, so just copy
-		char *newError = (char*)malloc(strlen(prefix) + 1);
-		strcpy(newError, prefix);
+		const size_t pLen = strlen(prefix);
+		char *newError = (char*)malloc(pLen + 1);
+		strncpy(newError, prefix, pLen + 1);
 		*error = newError;
 	}
 }
