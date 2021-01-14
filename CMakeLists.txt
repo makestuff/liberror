@@ -3,7 +3,8 @@ project(error)
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   set(LIBERROR_LIB_DIR "bin")
 else()
-  set(LIBERROR_LIB_DIR "lib")
+  include(GNUInstallDirs)
+  set(LIBERROR_LIB_DIR ${CMAKE_INSTALL_LIBDIR})
 endif()
 
 # Create a shared library
