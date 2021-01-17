@@ -29,8 +29,8 @@
         numBytes = snprintf(buffer, bufSize, "%s", sys_errlist[errCode]);
         return (numBytes >= bufSize) ? ERANGE : 0;
       } else {
-	numBytes = snprintf(buffer, bufSize, "Unknown error %d", errCode);
-	return EINVAL;
+        numBytes = snprintf(buffer, bufSize, "Unknown error %d", errCode);
+        return EINVAL;
       }
     }
   #elif defined(_MSC_VER)
@@ -72,25 +72,25 @@ DLLEXPORT(void) errRender(const char **error, const char *format, ...) {
 
       // If that worked, return the string
       if (status != -1 && (size_t)status < size) {
-	*error = bufPtr;
-	return;
+        *error = bufPtr;
+        return;
       }
 
       // Else try again with more space
       if (status == -1) {
-	// vsnprintf() in glibc 2.0 and MSVC not C99-compliant: returns -1 if buf too small
-	size *= 2;
+        // vsnprintf() in glibc 2.0 and MSVC not C99-compliant: returns -1 if buf too small
+        size *= 2;
       } else {
-	// vsnprintf() in glibc 2.1 is C99-compliant: returns the exact no. of bytes needed
-	size = (size_t)status + 1;
+        // vsnprintf() in glibc 2.1 is C99-compliant: returns the exact no. of bytes needed
+        size = (size_t)status + 1;
       }
       newBufPtr = (char*)realloc(bufPtr, size);
       if (newBufPtr == NULL) {
-	free(bufPtr);
-	*error = NULL;
-	return;
+        free(bufPtr);
+        *error = NULL;
+        return;
       } else {
-	bufPtr = newBufPtr;
+        bufPtr = newBufPtr;
       }
     }
   }
@@ -149,24 +149,24 @@ DLLEXPORT(void) errRenderStd(const char **error) {
       // Try to print in the allocated space
       status = strerror_r(errSave, bufPtr, size);
       if (status == 0) {
-	// Yay, it fits! (WIN32 comes through here even if the message was truncated...doh)
-	*error = bufPtr;
-	return;
+        // Yay, it fits! (WIN32 comes through here even if the message was truncated...doh)
+        *error = bufPtr;
+        return;
       } else if (status == -1 && errno == ERANGE) {
-	// It doesn't fit...resize buffer and try again
-	size *= 2;
+        // It doesn't fit...resize buffer and try again
+        size *= 2;
       } else {
-	// Some other problem...invalid errno perhaps?
-	*error = NULL;
-	return;
+        // Some other problem...invalid errno perhaps?
+        *error = NULL;
+        return;
       }
       newBufPtr = (char*)realloc(bufPtr, size);
       if (newBufPtr == NULL) {
-	free(bufPtr);
-	*error = NULL;
-	return;
+        free(bufPtr);
+        *error = NULL;
+        return;
       } else {
-	bufPtr = newBufPtr;
+        bufPtr = newBufPtr;
       }
     }
   }
