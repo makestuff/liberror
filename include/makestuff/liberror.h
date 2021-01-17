@@ -23,47 +23,47 @@
 extern "C" {
 #endif
 
-	#undef FAIL_INTERNAL3
-	#define FAIL_INTERNAL3(code, label, prefix) { \
-		errPrefix(error, prefix); \
-		retVal = code; \
-		goto label; \
-	}
+#undef FAIL_INTERNAL3
+#define FAIL_INTERNAL3(code, label, prefix) {  \
+  errPrefix(error, prefix);                    \
+  retVal = code;                               \
+  goto label;                                  \
+}
 
-	#undef FAIL_INTERNAL5
-	#define FAIL_INTERNAL5(code, label, ...) { \
-		errRender(error, __VA_ARGS__); \
-		retVal = code; \
-		goto label; \
-	}
+#undef FAIL_INTERNAL5
+#define FAIL_INTERNAL5(code, label, ...) {  \
+  errRender(error, __VA_ARGS__);            \
+  retVal = code;                            \
+  goto label;                               \
+}
 
-	#undef CHECK_INTERNAL4
-	#define CHECK_INTERNAL4(condition, value, label, prefix) \
-		if ( condition ) { \
-			errPrefix(error, prefix); \
-			retVal = value; \
-			goto label; \
-		}
+#undef CHECK_INTERNAL4
+#define CHECK_INTERNAL4(condition, value, label, prefix)  \
+  if (condition) {                                        \
+    errPrefix(error, prefix);                             \
+    retVal = value;                                       \
+    goto label;                                           \
+  }
 
-	#undef CHECK_INTERNAL5
-	#define CHECK_INTERNAL5(condition, value, label, ...) \
-		if ( condition ) { \
-			errRender(error, __VA_ARGS__); \
-			retVal = value; \
-			goto label; \
-		}
+#undef CHECK_INTERNAL5
+#define CHECK_INTERNAL5(condition, value, label, ...)  \
+  if (condition) {                                     \
+    errRender(error, __VA_ARGS__);                     \
+    retVal = value;                                    \
+    goto label;                                        \
+  }
 
-	// Render an error message into a newly-alloc'd buffer
-	DLLEXPORT(void) errRender(const char **error, const char *format, ...);
+// Render an error message into a newly-alloc'd buffer
+DLLEXPORT(void) errRender(const char **error, const char *format, ...);
 
-	// Add a prefix to the existing error (reallocate & copy)
-	DLLEXPORT(void) errPrefix(const char **error, const char *prefix);
+// Add a prefix to the existing error (reallocate & copy)
+DLLEXPORT(void) errPrefix(const char **error, const char *prefix);
 
-	// Render the last libc error
-	DLLEXPORT(void) errRenderStd(const char **error);
+// Render the last libc error
+DLLEXPORT(void) errRenderStd(const char **error);
 
-	// Deallocate an error string
-	DLLEXPORT(void) errFree(const char *error);
+// Deallocate an error string
+DLLEXPORT(void) errFree(const char *error);
 
 #ifdef __cplusplus
 }

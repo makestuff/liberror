@@ -20,74 +20,74 @@
 char buf[1024];
 
 void fillBuf(int count, char value) {
-	int i = 0;
-	while ( i < count ) {
-		buf[i++] = value;
-	}
-	buf[i++] = '\0';
-	while ( i < 1024 ) {
-		buf[i++] = '.';
-	}
+  int i = 0;
+  while (i < count) {
+    buf[i++] = value;
+  }
+  buf[i++] = '\0';
+  while (i < 1024) {
+    buf[i++] = '.';
+  }
 }
 
 TEST(Error, testNullRender) {
-	fillBuf(16, 'A');
-	errRender(NULL, buf);
+  fillBuf(16, 'A');
+  errRender(NULL, buf);
 }
 
 TEST(Error, testRender) {
-	int i;
-	const char *error;
-	for ( i = 500; i < 516; i++ ) {
-		error = NULL;
-		fillBuf(i, 'A');
-		errRender(&error, buf);
-		ASSERT_STREQ(buf, error);
-		errFree(error);
-	}
+  int i;
+  const char *error;
+  for (i = 500; i < 516; i++) {
+    error = NULL;
+    fillBuf(i, 'A');
+    errRender(&error, buf);
+    ASSERT_STREQ(buf, error);
+    errFree(error);
+  }
 }
 
 TEST(Error, testNullStdRender) {
-	fillBuf(16, 'A');
-	errRenderStd(NULL);
+  fillBuf(16, 'A');
+  errRenderStd(NULL);
 }
 
 TEST(Error, testStdRender) {
-	const char *error = NULL, *expected;
-	FILE *f;
-	f = fopen("nonExistentFile.txt", "r");
-	ASSERT_FALSE(f);
-	errRenderStd(&error);
-	f = fopen("nonExistentFile.txt", "r");
-	ASSERT_FALSE(f);
-	expected = strerror(errno);
-	ASSERT_STREQ(expected, error);
-	errFree(error);
+  const char *error = NULL, *expected;
+  FILE *f;
+  f = fopen("nonExistentFile.txt", "r");
+  ASSERT_FALSE(f);
+  errRenderStd(&error);
+  f = fopen("nonExistentFile.txt", "r");
+  ASSERT_FALSE(f);
+  expected = strerror(errno);
+  ASSERT_STREQ(expected, error);
+  errFree(error);
 }
 
 TEST(Error, testPrefixSomething) {
-	#define MSG "Foo Bar"
-	#define PFX "myPrefix()"
-	const char *error = NULL;
-	const char *const expected = PFX ": " MSG;
-	errRender(&error, MSG);
-	ASSERT_STREQ(MSG, error);
-	errPrefix(&error, PFX);
-	ASSERT_STREQ(expected, error);
-	errFree(error);
+#define MSG "Foo Bar"
+#define PFX "myPrefix()"
+  const char *error = NULL;
+  const char *const expected = PFX ": " MSG;
+  errRender(&error, MSG);
+  ASSERT_STREQ(MSG, error);
+  errPrefix(&error, PFX);
+  ASSERT_STREQ(expected, error);
+  errFree(error);
 }
 
 TEST(Error, testPrefixNothing) {
-	const char *error = NULL;
-	const char *const expected = "myPrefix(): Foo Bar";
-	errPrefix(&error, expected);
-	ASSERT_STREQ(expected, error);
-	errFree(error);
+  const char *error = NULL;
+  const char *const expected = "myPrefix(): Foo Bar";
+  errPrefix(&error, expected);
+  ASSERT_STREQ(expected, error);
+  errFree(error);
 }
 
 TEST(Error, testPrefixNull) {
-	const char *error = NULL;
-	errPrefix(NULL, "Foo");
-	errPrefix(&error, NULL);
-	ASSERT_FALSE(error);
+  const char *error = NULL;
+  errPrefix(NULL, "Foo");
+  errPrefix(&error, NULL);
+  ASSERT_FALSE(error);
 }
