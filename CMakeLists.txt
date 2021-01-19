@@ -25,3 +25,13 @@ install(
 if(BUILD_TESTING)
   add_subdirectory(tests)
 endif()
+
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/liberror.pc.in
+  ${CMAKE_CURRENT_BINARY_DIR}/liberror.pc
+@ONLY)
+
+install(
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/liberror.pc
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+)

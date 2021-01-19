@@ -1,0 +1,12 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=${prefix}
+libdir=${prefix}/@CMAKE_INSTALL_LIBDIR@
+includedir=${prefix}/include
+
+Name: liberror
+Description: A small library for rendering error messages.
+Requires: common
+Version: 20170708
+Libs: -L${libdir} -lerror
+Cflags: -I${includedir}
+
